@@ -1,9 +1,7 @@
 import numpy as np
 import cv2 as cv
 import matplotlib.pyplot as plt
-
-query_img = cv.imread('./img/testB_1.JPG', cv.IMREAD_COLOR) #query image
-train_img = cv.imread('./img/testB_2.JPG', cv.IMREAD_COLOR) #train image
+import os
 
 def get_transformed_img(query_img, train_img):
     gray1 = cv.cvtColor(query_img, cv.COLOR_BGR2GRAY)
@@ -74,9 +72,18 @@ def get_transformed_img(query_img, train_img):
 
 # img3 = cv.drawMatchesKnn(img1,kp1,img2,kp2,matches,None,**draw_params)
 
-transformed_image = get_transformed_img(query_img, train_img)
+folder_name = './stacks/'
+filenames = os.listdir(folder_name)
+train_img = cv.imread(folder_name+filenames[0], cv.IMREAD_COLOR) #train image
+image_data = [train_img]
+for i in range(len(filenames)):
+    if i == 0:
+        pass
+    else:
+        query_img = cv.imread(folder_name+filenames[i], cv.IMREAD_COLOR)
+        transformed_image = get_transformed_img(query_img, train_img)
+        image_data.append(transformed_image)
 
-image_data = [train_img, transformed_image]
 merged_img = image_data[0]
 for i in range(len(image_data)):
     if i == 0:
@@ -86,7 +93,7 @@ for i in range(len(image_data)):
         beta = 1.0 - alpha
         merged_img = cv.addWeighted(image_data[i], alpha, merged_img, beta, 0.0)
 
-cv.imwrite('./img/result.jpg', merged_img)
+cv.imwrite('./result.jpg', merged_img)
 # plt.figure()
 # plt.imshow(img3)
 # plt.figure()
